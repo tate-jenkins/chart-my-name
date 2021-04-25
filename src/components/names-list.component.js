@@ -46,10 +46,22 @@ export default class NamesList extends Component {
 
         console.log(nameObj);
 
-        axios.post('http://localhost:5000/add', nameObj)
-            .then(res => console.log(res.data));
+        axios.post('http://localhost:5002/chart', nameObj, {
+            headers: {
+            'Content-Type': 'application/json'
+            }
+          })
+        .then((response) => {
+            console.log(response);
+          }, (error) => {
+            console.log(error);
+          });
 
-        window.location = '/';
+        //window.location = '/';
+    }
+
+    namesList() {
+        return this.state.name;
     }
 
     render() {
@@ -90,7 +102,10 @@ export default class NamesList extends Component {
                 <input type="submit" value="Search" className="btn btn-primary" />
                 </div>
             </form>
+            <br></br>
+            <p>{ this.namesList() }</p>
             </div>
+            
         )
     }
 
