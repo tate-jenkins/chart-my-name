@@ -1,7 +1,8 @@
 import React, { Component } from 'react';
 import axios from 'axios';
+import Chart from './chart.component'
 
-export default class NamesList extends Component {
+class NamesList extends Component {
     constructor(props) {
         super(props);
 
@@ -11,11 +12,15 @@ export default class NamesList extends Component {
         this.onSubmit = this.onSubmit.bind(this);
 
         this.state = {
-            name: '',
-            nameSex: '',
-            targetSex: ''
+            name: 'Alexis',
+            nameSex: 'F',
+            targetSex: 'F',
+            data: [],
+            submitted: false
         };
     }
+
+    saveChanges
 
     onChangeName(e) {
         this.setState({
@@ -46,26 +51,39 @@ export default class NamesList extends Component {
 
         console.log(nameObj);
 
-        axios.post('http://localhost:5002/chart', nameObj, {
-            headers: {
-            'Content-Type': 'application/json'
-            }
-          })
-        .then((response) => {
-            console.log(response);
-          }, (error) => {
-            console.log(error);
-          });
+        this.makePost().then((data) => {
+            this.setState({data:data})
+            this.setState({submitted: true})
+        });
+        setTimeout(() => { this.setState({submitted: false}); }, 1);
+
+        //console.log(this.state.data);
 
         //window.location = '/';
     }
 
-    namesList() {
-        return this.state.name;
+    makePost = async () => {
+
+        const nameObj = {
+            name: this.state.name,
+            nameSex: this.state.nameSex,
+            targetSex: this.state.targetSex
+        }
+
+        let res = await axios.post('http://localhost:5005/chart', nameObj, {
+            headers: {
+            'Content-Type': 'application/json'
+            }
+          })
+        return res.data;
     }
 
+
     render() {
+        //console.log(this.state);
+
         return (
+
             <div>
             <h3>Find Similar Names</h3>
             <form onSubmit={this.onSubmit}>
@@ -81,33 +99,64 @@ export default class NamesList extends Component {
                 </div>
                 <div className="form-group"> 
                 <label>Sex of Name: </label>
-                <input  type="text"
+                <br></br>
+                <label>
+                <input  type="radio"
                     required
-                    className="form-control"
-                    value={this.state.nameSex}
+                    value="F"
+                    checked={this.state.nameSex === "F"}
                     onChange={this.onChangeNameSex}
                     />
+                    <span> F</span>
+                    </label>
+                <span>&ensp;&ensp;</span>
+                <label>
+                <input  type="radio"
+                    required
+                    value="M"
+                    checked={this.state.nameSex === "M"}
+                    onChange={this.onChangeNameSex}
+                    />
+                    <span> M</span>
+                    </label>
                 </div>
 
                 <div className="form-group">
-                <label>Sex of Targets: </label>
-                <input 
-                    type="text" 
-                    className="form-control"
-                    value={this.state.targetSex}
+                <label>Sex of Target: </label>
+                <br></br>
+                <label>
+                <input  type="radio"
+                    required
+                    value="F"
+                    checked={this.state.targetSex === "F"}
                     onChange={this.onChangeTargetSex}
                     />
+                    <span> F</span>
+                    </label>
+                <span>&ensp;&ensp;</span>
+                <label>
+                <input  type="radio"
+                    required
+                    value="M"
+                    checked={this.state.targetSex === "M"}
+                    onChange={this.onChangeTargetSex}
+                    />
+                    <span> M</span>
+                    </label>
                 </div>
-                <div className="form-group">
                 <input type="submit" value="Search" className="btn btn-primary" />
-                </div>
             </form>
             <br></br>
-            <p>{ this.namesList() }</p>
+            
+            <div>
+            {this.state.submitted && <Chart dataFromParent = {this.state.data} />}</div>
             </div>
             
         )
+
     }
 
 
 }
+
+export default NamesList;

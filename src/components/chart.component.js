@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import logo from '../logo.svg';
+//import logo from '../logo.svg';
 import '../App.css';
 import * as am4core from "@amcharts/amcharts4/core";
 import * as am4charts from "@amcharts/amcharts4/charts";
@@ -9,7 +9,17 @@ am4core.useTheme(am4themes_animated);
 
 
 
-export default class Chart extends Component {
+class Chart extends Component {
+
+  constructor(props) {
+    super(props);
+
+    this.state = {
+      data: this.props.dataFromParent
+    };
+  }
+
+
   componentDidMount() {
     let chart = am4core.create("chartdiv", am4charts.XYChart);
 
@@ -21,8 +31,22 @@ export default class Chart extends Component {
       visits += Math.round((Math.random() < 0.5 ? 1 : -1) * Math.random() * 10);
       data.push({ date: new Date(i, 0), name: "name" + i, value: visits });
     }
+    var dataArr = [];
+    var i;
 
-    chart.data = data;
+
+    if (!(typeof(this.state.data) == 'undefined')) {
+      const theData = this.state.data;
+      for (i=0; i < 140; i++) {
+        var dataObj = {};
+        dataObj["year"] = theData[0][i];
+        dataObj["rank"] = theData[1][i];
+        dataArr.push(dataObj);
+      }
+    }
+    //console.log(dataArr);
+
+    chart.data = dataArr;
 
     let dateAxis = chart.xAxes.push(new am4charts.DateAxis());
     dateAxis.renderer.grid.template.location = 0;
@@ -32,8 +56,8 @@ export default class Chart extends Component {
     valueAxis.renderer.minWidth = 35;
 
     let series = chart.series.push(new am4charts.LineSeries());
-    series.dataFields.dateX = "date";
-    series.dataFields.valueY = "value";
+    series.dataFields.dateX = "year";
+    series.dataFields.valueY = "rank";
 
     series.tooltipText = "{valueY.value}";
     chart.cursor = new am4charts.XYCursor();
@@ -52,8 +76,14 @@ export default class Chart extends Component {
   }
 
   render() {
+    
     return (
-      <div id="chartdiv" style={{ width: "100%", height: "500px" }}></div>
+      <div>
+        <div></div>
+        <div id="chartdiv" style={{ width: "100%", height: "400px" }}></div>
+      </div>
     );
   }
 }
+
+export default Chart;
